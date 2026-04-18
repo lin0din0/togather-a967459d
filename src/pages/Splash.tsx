@@ -10,8 +10,8 @@ const Splash = () => {
   if (!loading && !user && !hasOnboarded()) return <Navigate to="/welcome" replace />;
 
   return (
-    <div className="bg-gradient-splash flex min-h-full flex-col items-center justify-center px-8 pb-12 pt-20 text-center">
-      <img src={holdingHands} alt="Togather" className="anim-fade-up mb-7 h-72 w-72 object-contain" />
+    <div className="bg-gradient-splash flex min-h-full flex-col items-center justify-start px-8 pb-12 pt-6 text-center">
+      <img src={holdingHands} alt="Togather" className="anim-fade-up -mx-8 mb-2 w-[110%] max-w-none object-contain" />
       <h1 className="anim-fade-up font-display mb-3 text-[36px] font-semibold leading-[1.1] text-foreground">
         Spend your time
         <br />
