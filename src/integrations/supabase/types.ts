@@ -263,6 +263,7 @@ export type Database = {
       profiles: {
         Row: {
           activity_prefs: string[]
+          avatar_url: string | null
           budget_kr: number
           calendar_provider: string
           challenge: string | null
@@ -280,6 +281,7 @@ export type Database = {
         }
         Insert: {
           activity_prefs?: string[]
+          avatar_url?: string | null
           budget_kr?: number
           calendar_provider?: string
           challenge?: string | null
@@ -297,6 +299,7 @@ export type Database = {
         }
         Update: {
           activity_prefs?: string[]
+          avatar_url?: string | null
           budget_kr?: number
           calendar_provider?: string
           challenge?: string | null
