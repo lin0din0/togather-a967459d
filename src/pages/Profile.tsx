@@ -35,7 +35,7 @@ const Profile = () => {
   const [counts, setCounts] = useState({ people: 0 });
   const [submitting, setSubmitting] = useState(false);
 
-  const N8N_WEBHOOK_URL = "https://krtikaa285.app.n8n.cloud/webhook-test/lovable-project";
+  const N8N_WEBHOOK_URL = "https://krtikaa285.app.n8n.cloud/webhook-test/Receivefromlovable";
 
   const submitToN8n = async () => {
     if (!user) return;
