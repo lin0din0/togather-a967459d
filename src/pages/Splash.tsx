@@ -1,7 +1,7 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Logo } from "@/components/Logo";
 import { hasOnboarded } from "./Welcome";
+import holdingHands from "@/assets/holding-hands.svg";
 
 const Splash = () => {
   const { user, loading } = useAuth();
@@ -11,8 +11,8 @@ const Splash = () => {
 
   return (
     <div className="bg-gradient-splash flex min-h-full flex-col items-center justify-center px-8 pb-12 pt-20 text-center">
-      <div className="anim-fade-up mb-7 flex h-[72px] w-[72px] items-center justify-center rounded-full border-[1.5px] border-foreground bg-white shadow-card">
-        <Logo size={36} />
+      <div className="anim-fade-up mb-7 flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full border-[1.5px] border-foreground bg-white shadow-card">
+        <img src={holdingHands} alt="Togather" className="h-full w-full object-cover" />
       </div>
       <h1 className="anim-fade-up font-display mb-3 text-[36px] font-semibold leading-[1.1] text-foreground">
         Spend your time
