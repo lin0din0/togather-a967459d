@@ -16,6 +16,7 @@ type Profile = {
   activity_prefs?: string[];
   calendar_provider?: string;
   notifications_on?: boolean;
+  avatar_url?: string | null;
 };
 
 type Ctx = {
