@@ -57,9 +57,9 @@ const Home = () => {
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {todayLabel}
             </p>
-            <h1 className="font-display mt-1 text-[28px] font-semibold leading-[1.05] text-foreground">
+            <h1 className="font-display mt-1 text-[28px] font-normal leading-[1.05] text-foreground">
               Hello,<br />
-              <span className="italic">{name}</span>
+              <span className="italic font-light">{name}</span>
             </h1>
           </div>
           <Link
