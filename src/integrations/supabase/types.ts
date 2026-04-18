@@ -49,16 +49,63 @@ export type Database = {
           },
         ]
       }
+      event_attendees: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          person_id: string
+          responded_at: string | null
+          rsvp_status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          person_id: string
+          responded_at?: string | null
+          rsvp_status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          person_id?: string
+          responded_at?: string | null
+          rsvp_status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_attendees_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           cost_label: string | null
           created_at: string
           end_time: string
           event_date: string
+          external_id: string | null
           id: string
           location: string | null
           notes: string | null
           person_id: string | null
+          source: string
           start_time: string
           status: string
           title: string
@@ -69,10 +116,12 @@ export type Database = {
           created_at?: string
           end_time?: string
           event_date: string
+          external_id?: string | null
           id?: string
           location?: string | null
           notes?: string | null
           person_id?: string | null
+          source?: string
           start_time?: string
           status?: string
           title: string
@@ -83,10 +132,12 @@ export type Database = {
           created_at?: string
           end_time?: string
           event_date?: string
+          external_id?: string | null
           id?: string
           location?: string | null
           notes?: string | null
           person_id?: string | null
+          source?: string
           start_time?: string
           status?: string
           title?: string
@@ -98,6 +149,62 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_meeting_proposals: {
+        Row: {
+          attendee_person_ids: string[]
+          confirmed_event_id: string | null
+          created_at: string
+          date_range_end: string
+          date_range_start: string
+          id: string
+          notes: string | null
+          rsvp_responses: Json
+          status: string
+          suggested_slots: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendee_person_ids?: string[]
+          confirmed_event_id?: string | null
+          created_at?: string
+          date_range_end: string
+          date_range_start: string
+          id?: string
+          notes?: string | null
+          rsvp_responses?: Json
+          status?: string
+          suggested_slots?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendee_person_ids?: string[]
+          confirmed_event_id?: string | null
+          created_at?: string
+          date_range_end?: string
+          date_range_start?: string
+          id?: string
+          notes?: string | null
+          rsvp_responses?: Json
+          status?: string
+          suggested_slots?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_meeting_proposals_confirmed_event_id_fkey"
+            columns: ["confirmed_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
