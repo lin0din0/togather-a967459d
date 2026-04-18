@@ -4,7 +4,6 @@ import { Sparkles, Bell, Plus, ArrowRight, CalendarDays } from "lucide-react";
 import { useAuth, initialsOf } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import helloIllustration from "@/assets/hello-illustration.png";
 
 type Person = { id: string; name: string; initials: string; connection_type: string; cadence: string; last_met: string; status: string };
 type Reminder = { person_id?: string; person_name?: string; title?: string; message: string };
