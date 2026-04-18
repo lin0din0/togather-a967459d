@@ -145,7 +145,41 @@ const Profile = () => {
       {/* Hero card */}
       <section className="anim-fade-up anim-d1 mb-6 rounded-[28px] bg-gradient-soft px-6 py-8 text-center shadow-card ring-1 ring-border/40">
         <div className="mb-4 flex justify-center">
-          <PersonAvatar initials={initialsOf(display)} color="14 88% 62%" size="lg" />
+          <button
+            type="button"
+            onClick={onAvatarPick}
+            disabled={uploadingAvatar}
+            aria-label="Change profile picture"
+            className="group relative rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <PersonAvatar
+              initials={initialsOf(display)}
+              color="14 88% 62%"
+              size="lg"
+              imageUrl={profile?.avatar_url}
+            />
+            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/40 opacity-0 transition-opacity group-hover:opacity-100">
+              {uploadingAvatar ? (
+                <Loader2 className="h-5 w-5 animate-spin text-white" strokeWidth={2} />
+              ) : (
+                <Camera className="h-5 w-5 text-white" strokeWidth={2} />
+              )}
+            </span>
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-primary text-white shadow-card">
+              {uploadingAvatar ? (
+                <Loader2 className="h-3 w-3 animate-spin" strokeWidth={2.5} />
+              ) : (
+                <Camera className="h-3 w-3" strokeWidth={2.5} />
+              )}
+            </span>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onAvatarChange}
+          />
         </div>
         {editing ? (
           <div className="mx-auto mb-2 max-w-[220px]">
