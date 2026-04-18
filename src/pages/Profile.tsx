@@ -1,6 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, ChevronRight, LogOut, MapPin, MessageSquare, Megaphone, Shield, Sparkles, Check, X, Settings, Camera, Loader2 } from "lucide-react";
+import {
+  Bell,
+  ChevronRight,
+  LogOut,
+  MapPin,
+  MessageSquare,
+  Megaphone,
+  Shield,
+  Sparkles,
+  Check,
+  X,
+  Settings,
+} from "lucide-react";
 import { PersonAvatar } from "@/components/Avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,82 +45,6 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const [counts, setCounts] = useState({ people: 0 });
-  const [submitting, setSubmitting] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const N8N_WEBHOOK_URL = "https://krtikaa285.app.n8n.cloud/webhook-test/Receivefromlovable";
-
-  const onAvatarPick = () => fileInputRef.current?.click();
-
-  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    if (!file.type.startsWith("image/")) {
-      toast({ title: "Invalid file", description: "Please choose an image.", variant: "destructive" });
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max size is 5 MB.", variant: "destructive" });
-      return;
-    }
-    setUploadingAvatar(true);
-    try {
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
-      if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-      const url = pub.publicUrl;
-      const { error: updErr } = await supabase
-        .from("profiles")
-        .update({ avatar_url: url })
-        .eq("user_id", user.id);
-      if (updErr) throw updErr;
-      await refreshProfile();
-      toast({ title: "Profile picture updated" });
-    } catch (err) {
-      toast({
-        title: "Upload failed",
-        description: err instanceof Error ? err.message : "Unknown error",
-        variant: "destructive",
-      });
-    } finally {
-      setUploadingAvatar(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const submitToN8n = async () => {
-    if (!user) return;
-    setSubmitting(true);
-    try {
-      const payload = {
-        user_id: user.id,
-        email: user.email,
-        display_name: profile?.display_name ?? null,
-        location: profile?.location ?? null,
-        submitted_at: new Date().toISOString(),
-      };
-      const res = await fetch(N8N_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-      toast({ title: "Sent", description: "Your info was sent to n8n." });
-    } catch (err) {
-      toast({
-        title: "Submit failed",
-        description: err instanceof Error ? err.message : "Unknown error",
-        variant: "destructive",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   useEffect(() => {
     setName(profile?.display_name ?? "");
@@ -116,15 +52,22 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("people").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
-      setCounts({ people: count ?? 0 });
-    });
+    supabase
+      .from("people")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        setCounts({ people: count ?? 0 });
+      });
   }, [user]);
 
   const save = async () => {
     if (!user || !name.trim()) return;
     const { error } = await supabase.from("profiles").update({ display_name: name.trim() }).eq("user_id", user.id);
-    if (error) { toast({ title: "Couldn't save", description: error.message, variant: "destructive" }); return; }
+    if (error) {
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      return;
+    }
     await refreshProfile();
     toast({ title: "Updated", description: "Your name has been saved." });
     setEditing(false);
@@ -145,41 +88,7 @@ const Profile = () => {
       {/* Hero card */}
       <section className="anim-fade-up anim-d1 mb-6 rounded-[28px] bg-gradient-soft px-6 py-8 text-center shadow-card ring-1 ring-border/40">
         <div className="mb-4 flex justify-center">
-          <button
-            type="button"
-            onClick={onAvatarPick}
-            disabled={uploadingAvatar}
-            aria-label="Change profile picture"
-            className="group relative rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <PersonAvatar
-              initials={initialsOf(display)}
-              color="14 88% 62%"
-              size="lg"
-              imageUrl={profile?.avatar_url}
-            />
-            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/40 opacity-0 transition-opacity group-hover:opacity-100">
-              {uploadingAvatar ? (
-                <Loader2 className="h-5 w-5 animate-spin text-white" strokeWidth={2} />
-              ) : (
-                <Camera className="h-5 w-5 text-white" strokeWidth={2} />
-              )}
-            </span>
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-primary text-white shadow-card">
-              {uploadingAvatar ? (
-                <Loader2 className="h-3 w-3 animate-spin" strokeWidth={2.5} />
-              ) : (
-                <Camera className="h-3 w-3" strokeWidth={2.5} />
-              )}
-            </span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={onAvatarChange}
-          />
+          <PersonAvatar initials={initialsOf(display)} color="14 88% 62%" size="lg" />
         </div>
         {editing ? (
           <div className="mx-auto mb-2 max-w-[220px]">
@@ -198,7 +107,15 @@ const Profile = () => {
 
         {editing ? (
           <div className="mt-4 flex justify-center gap-2">
-            <Button size="sm" variant="outline" className="rounded-full px-4" onClick={() => { setEditing(false); setName(display); }}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full px-4"
+              onClick={() => {
+                setEditing(false);
+                setName(display);
+              }}
+            >
               <X className="h-3.5 w-3.5" /> Cancel
             </Button>
             <Button size="sm" className="rounded-full px-4" onClick={save}>
@@ -248,25 +165,25 @@ const Profile = () => {
                   <p className="text-[14px] font-medium leading-tight text-foreground">{it.label}</p>
                   <p className="mt-0.5 truncate text-[12.5px] text-muted-foreground">{it.value}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 flex-shrink-0 text-ink4 transition-transform group-hover:translate-x-0.5" strokeWidth={1.75} />
+                <ChevronRight
+                  className="h-4 w-4 flex-shrink-0 text-ink4 transition-transform group-hover:translate-x-0.5"
+                  strokeWidth={1.75}
+                />
               </li>
             ))}
           </ul>
         </section>
       ))}
 
-      {/* Submit to n8n */}
-      <div className="anim-fade-up mb-6">
-        <Button onClick={submitToN8n} disabled={submitting} className="w-full rounded-2xl">
-          {submitting ? "Submitting…" : "Submit"}
-        </Button>
-      </div>
-
       {/* Sign out */}
       <div className="anim-fade-up anim-d5 mt-auto pt-4">
         <Link
           to="/"
-          onClick={async (e) => { e.preventDefault(); await signOut(); window.location.href = "/"; }}
+          onClick={async (e) => {
+            e.preventDefault();
+            await signOut();
+            window.location.href = "/";
+          }}
           className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-white py-3.5 text-[13.5px] font-medium text-destructive transition-colors hover:bg-destructive/5"
         >
           <LogOut className="h-4 w-4" strokeWidth={1.75} /> Sign out
