@@ -91,6 +91,34 @@ const CalendarView = () => {
         })}
       </div>
 
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink4">
+          <Sparkles className="h-3 w-3 text-ai" strokeWidth={2} />
+          Common availability
+        </div>
+        {syncing && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+      </div>
+      {syncError ? (
+        <div className="mb-4 rounded-xl border border-border bg-muted/30 px-3.5 py-2.5 text-[12px] text-muted-foreground">
+          Couldn't sync calendar — {syncError}
+        </div>
+      ) : commonSlots.length === 0 && !syncing ? (
+        <div className="mb-4 rounded-xl border border-dashed border-border px-3.5 py-3 text-[12px] text-muted-foreground">
+          No shared free slots found yet.
+        </div>
+      ) : (
+        <div className="mb-5 space-y-1.5">
+          {commonSlots.slice(0, 5).map((s, i) => (
+            <div key={i} className="flex items-center justify-between rounded-xl border border-ai-soft bg-ai-bg px-3.5 py-2.5">
+              <div className="text-[12px] font-medium text-foreground">
+                {new Date(s.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+              </div>
+              <div className="text-[11px] text-muted-foreground">{s.start}{s.end ? `–${s.end}` : ""}{s.label ? ` · ${s.label}` : ""}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink4">Upcoming</div>
       {events.length === 0 ? (
         <div className="py-8 text-center text-[13px] text-muted-foreground">No events yet — start a chat to plan one.</div>
