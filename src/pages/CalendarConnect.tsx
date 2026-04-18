@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Lock, Check } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { StepHeader } from "@/components/StepHeader";
+import calendarIllustration from "@/assets/calendar-illustration.svg";
 
 const CalendarConnect = () => {
   const { user, refreshProfile } = useAuth();
