@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Ev = { id: string; title: string; event_date: string; start_time: string; end_time: string; location: string; cost_label: string; status: string };
+type Slot = { date: string; start: string; end: string; label?: string };
 
 const CalendarView = () => {
   const [anchor, setAnchor] = useState(() => new Date());
   const [events, setEvents] = useState<Ev[]>([]);
+  const [commonSlots, setCommonSlots] = useState<Slot[]>([]);
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const month = anchor.toLocaleDateString(undefined, { month: "long", year: "numeric" });
   const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -19,6 +23,22 @@ const CalendarView = () => {
     supabase.from("events").select("*").order("event_date").then(({ data }) => {
       if (data) setEvents(data as Ev[]);
     });
+
+    // Auto-trigger calendar sync via n8n on page load
+    let cancelled = false;
+    (async () => {
+      setSyncing(true);
+      setSyncError(null);
+      const { data, error } = await supabase.functions.invoke("calendar-sync", { body: {} });
+      if (cancelled) return;
+      if (error) {
+        setSyncError(error.message ?? "Sync failed");
+      } else if (data?.common_slots) {
+        setCommonSlots(data.common_slots as Slot[]);
+      }
+      setSyncing(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const eventDates = new Set(events.map((e) => e.event_date));
@@ -70,6 +90,34 @@ const CalendarView = () => {
           );
         })}
       </div>
+
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink4">
+          <Sparkles className="h-3 w-3 text-ai" strokeWidth={2} />
+          Common availability
+        </div>
+        {syncing && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+      </div>
+      {syncError ? (
+        <div className="mb-4 rounded-xl border border-border bg-muted/30 px-3.5 py-2.5 text-[12px] text-muted-foreground">
+          Couldn't sync calendar — {syncError}
+        </div>
+      ) : commonSlots.length === 0 && !syncing ? (
+        <div className="mb-4 rounded-xl border border-dashed border-border px-3.5 py-3 text-[12px] text-muted-foreground">
+          No shared free slots found yet.
+        </div>
+      ) : (
+        <div className="mb-5 space-y-1.5">
+          {commonSlots.slice(0, 5).map((s, i) => (
+            <div key={i} className="flex items-center justify-between rounded-xl border border-ai-soft bg-ai-bg px-3.5 py-2.5">
+              <div className="text-[12px] font-medium text-foreground">
+                {new Date(s.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+              </div>
+              <div className="text-[11px] text-muted-foreground">{s.start}{s.end ? `–${s.end}` : ""}{s.label ? ` · ${s.label}` : ""}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink4">Upcoming</div>
       {events.length === 0 ? (
