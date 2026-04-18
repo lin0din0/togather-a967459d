@@ -20,7 +20,7 @@ const Splash = () => {
         <em className="text-primary">intentionally.</em>
       </h1>
       <p className="anim-fade-up anim-d1 mb-12 max-w-[260px] text-[15px] leading-[1.6] text-muted-foreground">
-        Togather finds the time, plans the activity, and puts it in both your calendars.
+        Togather finds the time, plans the activity, and coordinates connection building for you.
       </p>
       <div className="w-full max-w-[320px] space-y-3">
         <button
