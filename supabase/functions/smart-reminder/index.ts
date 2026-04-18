@@ -29,9 +29,11 @@ Deno.serve(async (req) => {
 
   try {
     const webhookUrl = Deno.env.get("N8N_SMART_REMINDER_URL");
-    if (!webhookUrl) {
-      return new Response(JSON.stringify({ error: "N8N_SMART_REMINDER_URL not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (!webhookUrl || !/^https?:\/\//i.test(webhookUrl)) {
+      // Gracefully degrade: return empty reminders so UI doesn't break
+      console.warn("N8N_SMART_REMINDER_URL missing or invalid:", webhookUrl);
+      return new Response(JSON.stringify({ reminders: [], warning: "webhook not configured" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
