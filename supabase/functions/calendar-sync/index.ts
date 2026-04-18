@@ -87,7 +87,6 @@ Deno.serve(async (req) => {
 
     // Normalize: accept { common_slots: [...] } or array of slots, or raw events list
     let common_slots: Array<{ date: string; start: string; end: string; label?: string }> = [];
-    let events: Array<{ date: string; start?: string; end?: string; title?: string }> = [];
 
     if (Array.isArray(data)) {
       common_slots = data as any;
@@ -95,10 +94,49 @@ Deno.serve(async (req) => {
       const d = data as any;
       if (Array.isArray(d.common_slots)) common_slots = d.common_slots;
       if (Array.isArray(d.slots)) common_slots = d.slots;
-      if (Array.isArray(d.events)) events = d.events;
     }
 
-    return new Response(JSON.stringify({ common_slots, events, raw: data }), {
+    // Normalize busy slots: accept events:[{date,start,end,title}] or busy:[...]
+    const rawBusy: Array<any> = (() => {
+      if (Array.isArray(data)) return [];
+      if (data && typeof data === "object") {
+        const d = data as any;
+        if (Array.isArray(d.busy)) return d.busy;
+        if (Array.isArray(d.events)) return d.events;
+      }
+      return [];
+    })();
+
+    const busy = rawBusy
+      .map((b) => ({
+        date: b.date ?? (b.start ? String(b.start).slice(0, 10) : null),
+        start: b.start_time ?? (b.start ? String(b.start).slice(11, 16) : "00:00"),
+        end: b.end_time ?? (b.end ? String(b.end).slice(11, 16) : "23:59"),
+        title: b.title ?? "Busy",
+        external_id: b.id ?? b.external_id ?? null,
+      }))
+      .filter((b) => b.date);
+
+    // Cache google busy slots into events table
+    if (busy.length > 0) {
+      await supabase.from("events").delete().eq("user_id", user.id).eq("source", "google");
+      await supabase.from("events").insert(
+        busy.map((b) => ({
+          user_id: user.id,
+          title: b.title,
+          event_date: b.date,
+          start_time: b.start,
+          end_time: b.end,
+          source: "google",
+          status: "confirmed",
+          external_id: b.external_id,
+          location: "",
+          notes: "Google Calendar busy",
+        })),
+      );
+    }
+
+    return new Response(JSON.stringify({ common_slots, busy_count: busy.length, raw: data }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
