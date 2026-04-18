@@ -177,6 +177,13 @@ const Profile = () => {
         </section>
       ))}
 
+      {/* Submit to n8n */}
+      <div className="anim-fade-up mb-6">
+        <Button onClick={submitToN8n} disabled={submitting} className="w-full rounded-2xl">
+          {submitting ? "Submitting…" : "Submit"}
+        </Button>
+      </div>
+
       {/* Sign out */}
       <div className="anim-fade-up anim-d5 mt-auto pt-4">
         <Link
