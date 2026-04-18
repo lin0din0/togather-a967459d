@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Lock, Check } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { StepHeader } from "@/components/StepHeader";
+import calendarIllustration from "@/assets/calendar-illustration.svg";
 
 const CalendarConnect = () => {
   const { user, refreshProfile } = useAuth();
@@ -31,31 +32,12 @@ const CalendarConnect = () => {
       </div>
 
       {/* Hero illustration */}
-      <div className="anim-fade-up anim-d2 mb-8 flex items-center justify-center py-6">
-        <div className="flex items-center gap-5">
-          <div className="grid h-[96px] w-[96px] grid-cols-4 grid-rows-4 gap-1 rounded-2xl bg-white p-2 shadow-card ring-1 ring-border/60">
-            <div className="col-span-4 rounded-md bg-primary text-center text-[8px] font-semibold leading-[14px] text-white">
-              May
-            </div>
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="rounded-[3px]"
-                style={{
-                  background: [3, 7, 9].includes(i)
-                    ? "hsl(var(--success-soft))"
-                    : i === 1
-                    ? "hsl(var(--primary))"
-                    : "hsl(var(--secondary))",
-                }}
-              />
-            ))}
-          </div>
-          <div className="flex h-px w-6 items-center justify-center bg-border" />
-          <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full border-[1.5px] border-ai-soft bg-ai-bg">
-            <Lock className="h-[18px] w-[18px] text-ai" strokeWidth={1.75} />
-          </div>
-        </div>
+      <div className="anim-fade-up anim-d2 -mx-6 mb-8 flex items-center justify-center">
+        <img
+          src={calendarIllustration}
+          alt="Calendar connection illustration"
+          className="h-auto w-full max-w-[420px]"
+        />
       </div>
 
       {/* Trust points */}
