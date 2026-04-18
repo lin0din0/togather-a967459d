@@ -1,11 +1,14 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { TabBar } from "./TabBar";
 
-const HIDE_TABBAR = ["/", "/welcome", "/auth", "/forgot-password", "/reset-password", "/calendar-connect", "/budget", "/add-connection", "/invite-sent"];
+const HIDE_TABBAR_EXACT = ["/", "/welcome", "/auth", "/forgot-password", "/reset-password", "/calendar-connect", "/budget", "/add-connection", "/invite-sent"];
+const HIDE_TABBAR_PREFIX = ["/chat/"]; // immersive chat threads
 
 const AppLayout = () => {
   const { pathname } = useLocation();
-  const showTabBar = !HIDE_TABBAR.includes(pathname);
+  const showTabBar =
+    !HIDE_TABBAR_EXACT.includes(pathname) &&
+    !HIDE_TABBAR_PREFIX.some((p) => pathname.startsWith(p));
 
   return (
     <div className="flex min-h-screen items-start justify-center bg-background px-2 py-4 sm:px-4 sm:py-8 md:px-6 md:py-10">
