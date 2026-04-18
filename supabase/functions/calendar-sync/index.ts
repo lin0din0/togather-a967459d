@@ -10,9 +10,10 @@ Deno.serve(async (req) => {
 
   try {
     const webhookUrl = Deno.env.get("N8N_CALENDAR_SYNC_URL");
-    if (!webhookUrl) {
-      return new Response(JSON.stringify({ error: "N8N_CALENDAR_SYNC_URL not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (!webhookUrl || !/^https?:\/\//i.test(webhookUrl)) {
+      console.warn("N8N_CALENDAR_SYNC_URL missing or invalid:", webhookUrl);
+      return new Response(JSON.stringify({ common_slots: [], busy_count: 0, warning: "webhook not configured" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
