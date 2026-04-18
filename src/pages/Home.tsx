@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Bell } from "lucide-react";
 import { useAuth, initialsOf } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Person = { id: string; name: string; initials: string; connection_type: string; cadence: string; last_met: string; status: string };
+type Reminder = { person_id?: string; person_name?: string; title?: string; message: string };
 
 const today = new Date();
 const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
@@ -14,11 +15,19 @@ const weekStart = (() => { const d = new Date(today); const dow = (d.getDay()+6)
 const Home = () => {
   const { profile } = useAuth();
   const [people, setPeople] = useState<Person[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [remindersLoading, setRemindersLoading] = useState(true);
 
   useEffect(() => {
     supabase.from("people").select("id,name,initials,connection_type,cadence,last_met,status").limit(8).then(({ data }) => {
       if (data) setPeople(data as Person[]);
     });
+
+    // Fetch smart reminders for overdue cadences via n8n webhook
+    supabase.functions.invoke("smart-reminder").then(({ data, error }) => {
+      if (!error && data?.reminders) setReminders(data.reminders as Reminder[]);
+      setRemindersLoading(false);
+    }).catch(() => setRemindersLoading(false));
   }, []);
 
   const name = profile?.display_name ?? "friend";
@@ -88,6 +97,49 @@ const Home = () => {
           </div>
         </Link>
       </div>
+
+      {/* Smart reminders from n8n */}
+      {(remindersLoading || reminders.length > 0) && (
+        <div className="mt-4 px-[22px]">
+          <div className="mb-2 flex items-center gap-1.5">
+            <Bell className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Gentle reminders
+            </div>
+          </div>
+          {remindersLoading ? (
+            <div className="rounded-2xl border-[1.5px] border-foreground/10 bg-white p-3.5">
+              <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
+              <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-muted" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {reminders.slice(0, 3).map((r, i) => {
+                const target = r.person_id ? `/chat/${r.person_id}` : "/chat";
+                return (
+                  <Link
+                    key={i}
+                    to={target}
+                    className="block rounded-2xl border-[1.5px] border-foreground bg-gradient-soft p-3.5 transition-transform active:scale-[0.99]"
+                  >
+                    {r.person_name && (
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                        {r.person_name}
+                      </div>
+                    )}
+                    {r.title && (
+                      <div className="mt-0.5 text-[14px] font-semibold leading-tight text-foreground">
+                        {r.title}
+                      </div>
+                    )}
+                    <div className="mt-1 text-[12.5px] leading-[1.5] text-ink2">{r.message}</div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* People bento */}
       <div className="mt-4 flex items-baseline justify-between px-[22px]">
