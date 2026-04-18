@@ -111,14 +111,20 @@ const ChatThread = () => {
             <DropdownMenuContent align="end" sideOffset={8} className="w-56">
               <DropdownMenuLabel>Chat settings</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <Pencil className="mr-2 h-4 w-4" /> Edit goal & cadence
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to={`/chat/${personId}/goal`}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit goal & cadence
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Sparkles className="mr-2 h-4 w-4 text-ai" /> Togather AI preferences
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to={`/chat/${personId}/ai-preferences`}>
+                  <Sparkles className="mr-2 h-4 w-4 text-ai" /> Togather AI preferences
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <BellOff className="mr-2 h-4 w-4" /> Mute notifications
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to={`/chat/${personId}/notifications`}>
+                  <BellOff className="mr-2 h-4 w-4" /> Mute notifications
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">

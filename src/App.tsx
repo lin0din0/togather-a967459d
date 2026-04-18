@@ -18,6 +18,9 @@ import InviteSent from "./pages/InviteSent";
 import Home from "./pages/Home";
 import ChatList from "./pages/ChatList";
 import ChatThread from "./pages/ChatThread";
+import ChatGoalSettings from "./pages/ChatGoalSettings";
+import ChatAIPreferences from "./pages/ChatAIPreferences";
+import ChatNotifications from "./pages/ChatNotifications";
 import CalendarView from "./pages/CalendarView";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -46,6 +49,9 @@ const App = () => (
               <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/chat" element={<ProtectedRoute><ChatList /></ProtectedRoute>} />
               <Route path="/chat/:personId" element={<ProtectedRoute><ChatThread /></ProtectedRoute>} />
+              <Route path="/chat/:personId/goal" element={<ProtectedRoute><ChatGoalSettings /></ProtectedRoute>} />
+              <Route path="/chat/:personId/ai-preferences" element={<ProtectedRoute><ChatAIPreferences /></ProtectedRoute>} />
+              <Route path="/chat/:personId/notifications" element={<ProtectedRoute><ChatNotifications /></ProtectedRoute>} />
               <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
