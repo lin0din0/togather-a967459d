@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Ev = { id: string; title: string; event_date: string; start_time: string; end_time: string; location: string; cost_label: string; status: string };
+type Slot = { date: string; start: string; end: string; label?: string };
 
 const CalendarView = () => {
   const [anchor, setAnchor] = useState(() => new Date());
   const [events, setEvents] = useState<Ev[]>([]);
+  const [commonSlots, setCommonSlots] = useState<Slot[]>([]);
+  const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const month = anchor.toLocaleDateString(undefined, { month: "long", year: "numeric" });
   const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -19,6 +23,22 @@ const CalendarView = () => {
     supabase.from("events").select("*").order("event_date").then(({ data }) => {
       if (data) setEvents(data as Ev[]);
     });
+
+    // Auto-trigger calendar sync via n8n on page load
+    let cancelled = false;
+    (async () => {
+      setSyncing(true);
+      setSyncError(null);
+      const { data, error } = await supabase.functions.invoke("calendar-sync", { body: {} });
+      if (cancelled) return;
+      if (error) {
+        setSyncError(error.message ?? "Sync failed");
+      } else if (data?.common_slots) {
+        setCommonSlots(data.common_slots as Slot[]);
+      }
+      setSyncing(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const eventDates = new Set(events.map((e) => e.event_date));
