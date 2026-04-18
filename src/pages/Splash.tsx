@@ -27,7 +27,7 @@ const Splash = () => {
       {/* Top brand row */}
       <header className="anim-fade-up relative z-10 flex items-center justify-between">
         <span className="font-display text-[20px] font-semibold tracking-tight text-foreground">
-          Togather
+          togather
         </span>
         <span className="rounded-full border border-foreground/10 bg-white/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-ink2 backdrop-blur">
           Beta
@@ -108,7 +108,7 @@ const Splash = () => {
               fill="hsl(var(--warning))"
             />
           </svg>
-          Loved by 2,400+ intentional humans
+          Loved by 5 intentional hackatoners
         </p>
       </section>
     </main>
