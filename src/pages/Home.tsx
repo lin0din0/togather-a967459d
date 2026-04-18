@@ -48,9 +48,9 @@ const Home = () => {
   const variants = ["coral", "violet", "teal", "neutral"] as const;
 
   return (
-    <div className="min-h-full bg-surface pb-8 pt-[50px]">
+    <div className="min-h-full bg-surface pb-8">
       {/* ===== HEADER — illustrated greeting ===== */}
-      <header className="relative overflow-hidden bg-gradient-soft px-5 pb-6 pt-4">
+      <header className="relative overflow-hidden bg-gradient-soft px-5 pb-6 pt-[60px]">
         {/* Top bar: date + avatar */}
         <div className="relative z-10 mb-4 flex items-start justify-between">
           <div className="min-w-0">
@@ -71,16 +71,6 @@ const Home = () => {
             <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-surface bg-primary" />
           </Link>
         </div>
-
-        {/* Illustration sits beside the greeting */}
-        <img
-          src={helloIllustration}
-          alt=""
-          aria-hidden="true"
-          width={140}
-          height={140}
-          className="pointer-events-none absolute -right-3 top-2 h-[140px] w-[140px] select-none opacity-95"
-        />
 
         {/* Hero card */}
         <Link
