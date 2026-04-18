@@ -33,6 +33,38 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const [counts, setCounts] = useState({ people: 0 });
+  const [submitting, setSubmitting] = useState(false);
+
+  const N8N_WEBHOOK_URL = "https://krtikaa285.app.n8n.cloud/webhook-test/lovable-project";
+
+  const submitToN8n = async () => {
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      const payload = {
+        user_id: user.id,
+        email: user.email,
+        display_name: profile?.display_name ?? null,
+        location: profile?.location ?? null,
+        submitted_at: new Date().toISOString(),
+      };
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      toast({ title: "Sent", description: "Your info was sent to n8n." });
+    } catch (err) {
+      toast({
+        title: "Submit failed",
+        description: err instanceof Error ? err.message : "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     setName(profile?.display_name ?? "");
@@ -144,6 +176,13 @@ const Profile = () => {
           </ul>
         </section>
       ))}
+
+      {/* Submit to n8n */}
+      <div className="anim-fade-up mb-6">
+        <Button onClick={submitToN8n} disabled={submitting} className="w-full rounded-2xl">
+          {submitting ? "Submitting…" : "Submit"}
+        </Button>
+      </div>
 
       {/* Sign out */}
       <div className="anim-fade-up anim-d5 mt-auto pt-4">
