@@ -29,9 +29,6 @@ const Splash = () => {
         <span className="font-display text-[20px] font-semibold tracking-tight text-foreground">
           togather
         </span>
-        <span className="rounded-full border border-foreground/10 bg-white/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-ink2 backdrop-blur">
-          Beta
-        </span>
       </header>
 
       {/* Hero illustration */}
